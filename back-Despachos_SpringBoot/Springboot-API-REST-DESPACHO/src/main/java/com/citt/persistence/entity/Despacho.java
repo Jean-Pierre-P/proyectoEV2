@@ -1,32 +1,27 @@
 package com.citt.persistence.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Data
+@Table(name = "despachos")
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Despacho {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDespacho;
-    //@NotNull(message = "Fecha de despacho es obligatoria")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)  // Especifica el formato de fecha
-    private LocalDate fechaDespacho;
-    private String patenteCamion;
-    private int intento;
     private Long idCompra;
-    //@NotBlank(message = "La dirección es obligatoria")
     private String direccionCompra;
-    private Long valorCompra;
-    private boolean despachado = false;
+    private String fechaDespacho;
+    private String patenteCamion;
+
+    @Builder.Default
+    private Boolean entregado = false;
+
+    @Builder.Default
+    private Integer intento = 0;
 }
