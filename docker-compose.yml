@@ -5,14 +5,19 @@ services:
     image: mysql:8.0
     container_name: mysql_db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: innovatech_db
-      MYSQL_USER: Alex
-      MYSQL_PASSWORD: contraseña
-    ports:
-      - "3306:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${Alex}
+      MYSQL_PASSWORD: ${contraseña}
     volumes:
       - mysql_data:/var/lib/mysql
+    # Agregamos Healthcheck para que otros servicios sepan cuándo está lista
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - back-net
 
   back-despachos:
     build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
@@ -20,13 +25,17 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - DB_ENDPOINT=db
-      - DB_PORT=3306
-      - DB_NAME=innovatech_db
-      - DB_USERNAME=Alex
-      - DB_PASSWORD=contraseña
+      - DB_ENDPOINT=${DB_ENDPOINT}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USERNAME=${Alex}
+      - DB_PASSWORD=${contraseña}
     depends_on:
-      - db
+      db:
+        condition: service_healthy # Espera a que la DB esté realmente lista
+    networks:
+      - back-net
+      - front-net
 
   back-ventas:
     build: ./back-Ventas_SpringBoot/Springboot-API-REST
@@ -34,13 +43,17 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_ENDPOINT=db
-      - DB_PORT=3306
-      - DB_NAME=innovatech_db
-      - DB_USERNAME=Alex
-      - DB_PASSWORD=contraseña
+      - DB_ENDPOINT=${DB_ENDPOINT}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USERNAME=${Alex}
+      - DB_PASSWORD=${contraseña}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - back-net
+      - front-net
 
   frontend:
     build: ./front_despacho
@@ -50,6 +63,12 @@ services:
     depends_on:
       - back-despachos
       - back-ventas
+    networks:
+      - front-net
+
+networks:
+  front-net: # Red para comunicación Web
+  back-net:  # Red privada para comunicación con la Base de Datos
 
 volumes:
   mysql_data:
