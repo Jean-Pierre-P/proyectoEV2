@@ -13,27 +13,13 @@
       "valorCompra": 12590,
       "fechaCompra": "2024-03-05",
       "despachoGenerado": false
-    },
-    {
-      "idVenta": 3,
-      "direccionCompra": "Avenida Por atrás 1313",
-      "valorCompra": 13990,
-      "fechaCompra": "2024-04-20",
-      "despachoGenerado": false
-    },
-    {
-      "idVenta": 4,
-      "direccionCompra": "Calle presidente kirby 8528",
-      "valorCompra": 9990,
-      "fechaCompra": "2024-04-15",
-      "despachoGenerado": false
     }
   ],
   "despachos": [
     {
       "idDespacho": 101,
       "idCompra": 1,
-      "direccionCompra": "P Sherman Calle Wallabi 42 Syndey",
+      "direccionCompra": "Avenida siempre viva 123",
       "fechaDespacho": "2024-05-11",
       "patenteCamion": "AB-CD-12",
       "entregado": false,
@@ -41,31 +27,9 @@
     }
   ],
   "usuarios": [
-    {
-      "id": 1,
-      "nombre": "Alex",
-      "rol": "Administrador",
-      "correo": "alex@innovatech.cl"
-    },
-    {
-      "id": 2,
-      "nombre": "Jean Pierre",
-      "rol": "Operador",
-      "correo": "jean@innovatech.cl"
-    }
+    { "id": 1, "nombre": "Alex", "rol": "Admin", "correo": "alex@innovatech.cl" }
   ],
   "productos": [
-    {
-      "id": 1,
-      "nombre": "Teclado Mecánico RGB",
-      "precio": 45000,
-      "stock": 15
-    },
-    {
-      "id": 2,
-      "nombre": "Mouse Gamer Pro",
-      "precio": 25000,
-      "stock": 30
-    }
+    { "id": 1, "nombre": "Teclado Mecánico", "precio": 45000, "stock": 15 }
   ]
 }
