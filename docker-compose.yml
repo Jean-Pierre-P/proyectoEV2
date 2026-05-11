@@ -7,13 +7,13 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${Alex}
-      MYSQL_PASSWORD: ${contraseña}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     # Agregamos Healthcheck para que otros servicios sepan cuándo está lista
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
       timeout: 5s
       retries: 10
     networks:
@@ -28,8 +28,8 @@ services:
       - DB_ENDPOINT=${DB_ENDPOINT}
       - DB_PORT=${DB_PORT}
       - DB_NAME=${MYSQL_DATABASE}
-      - DB_USERNAME=${Alex}
-      - DB_PASSWORD=${contraseña}
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
     depends_on:
       db:
         condition: service_healthy # Espera a que la DB esté realmente lista
@@ -46,8 +46,8 @@ services:
       - DB_ENDPOINT=${DB_ENDPOINT}
       - DB_PORT=${DB_PORT}
       - DB_NAME=${MYSQL_DATABASE}
-      - DB_USERNAME=${Alex}
-      - DB_PASSWORD=${contraseña}
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
