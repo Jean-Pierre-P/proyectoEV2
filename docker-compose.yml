@@ -11,11 +11,11 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
-    # Agregamos Healthcheck para que otros servicios sepan cuándo está lista
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
       timeout: 5s
       retries: 10
+      interval: 10s
     networks:
       - back-net
 
@@ -32,7 +32,7 @@ services:
       - DB_PASSWORD=${MYSQL_PASSWORD}
     depends_on:
       db:
-        condition: service_healthy # Espera a que la DB esté realmente lista
+        condition: service_healthy 
     networks:
       - back-net
       - front-net
@@ -67,8 +67,8 @@ services:
       - front-net
 
 networks:
-  front-net: # Red para comunicación Web
-  back-net:  # Red privada para comunicación con la Base de Datos
+  front-net:
+  back-net:
 
 volumes:
   mysql_data:
