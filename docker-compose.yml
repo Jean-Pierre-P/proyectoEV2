@@ -19,50 +19,31 @@ services:
     networks:
       - back-net
 
-  back-despachos:
-    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
-    container_name: back-despachos
+  # Nuevo servicio para manejar Usuarios y Productos desde db.json
+  mock-api:
+    image: node:18-alpine
+    container_name: mock-api
+    working_dir: /app
+    volumes:
+      - ./front_despacho:/app
     ports:
-      - "8081:8081"
-    environment:
-      - DB_ENDPOINT=${DB_ENDPOINT}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${MYSQL_DATABASE}
-      - DB_USERNAME=${MYSQL_USER}
-      - DB_PASSWORD=${MYSQL_PASSWORD}
-    depends_on:
-      db:
-        condition: service_healthy 
+      - "3000:3000"
+    command: npx json-server --watch db.json --host 0.0.0.0
     networks:
-      - back-net
       - front-net
 
-  back-ventas:
-    build: ./back-Ventas_SpringBoot/Springboot-API-REST
-    container_name: back-ventas
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_ENDPOINT=${DB_ENDPOINT}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${MYSQL_DATABASE}
-      - DB_USERNAME=${MYSQL_USER}
-      - DB_PASSWORD=${MYSQL_PASSWORD}
-    depends_on:
-      db:
-        condition: service_healthy
+  back-despachos:
+    # ... (resto de tu configuración actual)
     networks:
       - back-net
       - front-net
+    # ...
 
   frontend:
-    build: ./front_despacho
-    container_name: frontend
-    ports:
-      - "80:80"
+    # ... (resto de tu configuración actual)
     depends_on:
       - back-despachos
-      - back-ventas
+      - mock-api
     networks:
       - front-net
 
