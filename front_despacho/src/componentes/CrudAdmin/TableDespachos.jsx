@@ -6,19 +6,17 @@ import { FormCierreDespacho } from "./FormCierreDespacho";
 export const TableDespachos = () => {
   const [despachos, setDespachos] = useState([]);
 
-  const despacho = async () => {
-    // CAMBIO: Apuntamos a localhost:8081 para el backend de Despachos
+  const cargarDespachos = async () => {
+    const url = import.meta.env.VITE_API_DESPACHOS_URL;
     try {
-      const response = await axios.get("http://localhost:8081/api/v1/despachos", {
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
-      });
+      const response = await axios.get(url);
       setDespachos(response.data);
     } catch (error) {
-      console.error("Error conectando a Despachos:", error);
+      console.error("Error al cargar despachos:", error);
     }
   };
 
-  useEffect(() => { despacho(); }, []);
+  useEffect(() => { cargarDespachos(); }, []);
 
   const [openModal, setOpenModal] = useState(false);
   const [despachoSeleccionado, setDespachoSeleccionado] = useState(null);
@@ -27,24 +25,30 @@ export const TableDespachos = () => {
     <>
       <section className="grid text-center grid-cols-12 mb-8">
         <div className="col-span-12 flex justify-center">
-          <div className="col-span-10 p-2 bg-white border border-gray-200 rounded-lg shadow h-full overflow-hidden">
+          <div className="col-span-11 p-4 bg-white border border-gray-200 rounded-lg shadow h-full overflow-hidden">
             <table className="table-fixed w-full">
               <thead>
-                <tr>
-                  <th>Orden despacho</th>
-                  <th>Dirección</th>
+                <tr className="border-b">
+                  <th>ID Despacho</th>
+                  <th>ID Compra</th>
+                  <th>Destino</th>
+                  <th>Camión</th>
                   <th>Estado</th>
                   <th>Acción</th>
                 </tr>
               </thead>
               <tbody>
                 {despachos.map((d) => (
-                  <tr key={d.idDespacho}>
+                  <tr key={d.idDespacho} className="border-b">
                     <td className="py-4">{d.idDespacho}</td>
-                    <td className="py-4">{d.direccionCompra}</td>
-                    <td className="py-4">{d.entregado ? "Entregado" : "Pendiente"}</td>
+                    <td>{d.idCompra}</td>
+                    <td>{d.direccionCompra}</td>
+                    <td>{d.patenteCamion}</td>
+                    <td className={d.entregado ? "text-green-600" : "text-orange-500"}>
+                      {d.entregado ? "Entregado" : "Pendiente"}
+                    </td>
                     <td>
-                      <button onClick={() => { setDespachoSeleccionado(d); setOpenModal(true); }} className="bg-orange-200 px-4 py-1 rounded-xl">
+                      <button onClick={() => {setDespachoSeleccionado(d); setOpenModal(true);}} className="bg-orange-200 px-4 py-1 rounded-xl">
                         Cerrar
                       </button>
                     </td>
@@ -56,9 +60,7 @@ export const TableDespachos = () => {
         </div>
       </section>
       <Modal onClose={() => setOpenModal(false)} open={openModal}>
-        {despachoSeleccionado && (
-          <FormCierreDespacho despacho={despachoSeleccionado} onClose={() => { setOpenModal(false); despacho(); }} />
-        )}
+        {despachoSeleccionado && <FormCierreDespacho despacho={despachoSeleccionado} onClose={() => {setOpenModal(false); cargarDespachos();}} />}
       </Modal>
     </>
   );
