@@ -1,34 +1,33 @@
+import { Link } from "react-router-dom";
+
 function Navbar() {
   return (
-    <nav className="rounded-xl w-[250px] min-h-[880px] bg-teal-600 text-white sticky top-0 p-4 m-4">
-      {/* Logo o título */}
-      <h2 className="text-xl font-bold mb-8">Despacho Dashboard</h2>
-
-      {/* Menú de navegación */}
+    <nav className="rounded-xl w-[250px] min-h-[880px] bg-teal-600 text-white sticky top-0 p-4 m-4 shadow-lg">
+      <h2 className="text-xl font-bold mb-8 border-b border-teal-500 pb-4">Despacho Dashboard</h2>
       <ul className="space-y-3">
         <li>
-          <a
-            href="#"
-            className="block font-bold py-2 px-3 hover:bg-teal-700 rounded"
+          <Link
+            to="/"
+            className="block font-bold py-2 px-3 hover:bg-teal-700 rounded transition-colors"
+          >
+            Dashboard Principal
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/usuarios"
+            className="block font-bold py-2 px-3 hover:bg-teal-700 rounded transition-colors"
           >
             Usuarios
-          </a>
+          </Link>
         </li>
         <li>
-          <a
-            href="#"
-            className="block font-bold py-2 px-3 hover:bg-teal-700 rounded"
+          <Link
+            to="/productos"
+            className="block font-bold py-2 px-3 hover:bg-teal-700 rounded transition-colors"
           >
             Productos
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            className="block font-bold py-2 px-3 hover:bg-teal-700 rounded"
-          >
-            Configuración
-          </a>
+          </Link>
         </li>
       </ul>
     </nav>
