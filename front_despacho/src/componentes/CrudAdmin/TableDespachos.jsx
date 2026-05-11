@@ -6,22 +6,26 @@ import { FormCierreDespacho } from "./FormCierreDespacho";
 export const TableDespachos = () => {
   const [despachos, setDespachos] = useState([]);
 
-  const despacho = async () => {
-    await axios
-      .get("http://192.168.3.20/api/v1/despachos", {
-        headers:{
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
+  const cargarDespachos = async () => {
+    // Usamos la variable de entorno para evitar fallos en AWS
+    const url = import.meta.env.VITE_API_DESPACHOS_URL;
+    
+    try {
+      await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
-      })
-      .then((response) => {
-        console.log(response.data);
+      }).then((response) => {
         setDespachos(response.data);
       });
+    } catch (error) {
+      console.error("Error al conectar con el servicio de despachos:", error);
+    }
   };
-  // Llamada a la función para obtener los datos cuando el componente se monta
+
   useEffect(() => {
-    despacho();
+    cargarDespachos();
   }, []);
 
   const [openModal, setOpenModal] = useState(false);
@@ -36,51 +40,41 @@ export const TableDespachos = () => {
     <>
       <section className="grid text-center grid-cols-12 mb-8">
         <div className="col-span-12 flex justify-center">
-          <div className="col-span-10 p-2 bg-white border border-gray-200 rounded-lg shadow dark:bg-white h-full overflow-hidden">
-            <table className="table-fixed">
+          <div className="col-span-11 p-4 bg-white border border-gray-200 rounded-lg shadow h-full overflow-hidden">
+            <h2 className="text-xl font-bold mb-4 text-teal-700">Consultas de Despachos</h2>
+            <table className="table-fixed w-full text-sm">
               <thead>
-                <tr className="py-10">
-                  <th className="pr-10">Orden de despacho</th>
-                  <th className="pr-10">Orden de compra</th>
-                  <th className="pr-10">Dirección de entrega</th>
-                  <th className="pr-10">Fecha despacho</th>
-                  <th className="pr-10">Patente Camión</th>
-                  <th className="pr-10">Entregado</th>
-                  <th className="pr-10">Intentos de entrega</th>
+                <tr className="border-b">
+                  <th className="py-4">ID Despacho</th>
+                  <th className="py-4">ID Compra</th>
+                  <th className="py-4">Destino</th>
+                  <th className="py-4">Fecha</th>
+                  <th className="py-4">Camión</th>
+                  <th className="py-4">Estado</th>
+                  <th className="py-4">Acción</th>
                 </tr>
               </thead>
               <tbody>
-                {despachos
-               
-                .map((despacho) => (
-                  <tr key={despacho.idDespacho}>
-                    <td className="pr-10 py-10 items-center">{despacho.idDespacho}</td>
-                    <td className="pr-10 py-10  items-center">
-                      {despacho.idCompra}
-                    </td>
-                    <td className="pr-10 py-10  items-center">
-                      {despacho.direccionCompra}
-                    </td>
-                    <td className="pr-10 py-10  items-center">
-                      {despacho.fechaDespacho}
-                    </td>
-                    <td className="pr-10 py-10  items-center">
-                      {despacho.patenteCamion}
-                    </td>
-                    <td className="pr-10 py-10  items-center">
-                      {despacho.entregado
-                        ? "Despacho entregado"
-                        : "Despacho pendiente"}
-                    </td>
-                    <td className="pr-10 py-10  items-center">
-                      {despacho.intento}
+                {despachos.map((despacho) => (
+                  <tr key={despacho.idDespacho} className="border-b hover:bg-gray-50">
+                    <td className="py-4">{despacho.idDespacho}</td>
+                    <td className="py-4">{despacho.idCompra}</td>
+                    <td className="py-4">{despacho.direccionCompra}</td>
+                    <td className="py-4">{despacho.fechaDespacho}</td>
+                    <td className="py-4">{despacho.patenteCamion}</td>
+                    <td className="py-4">
+                      {despacho.entregado ? (
+                        <span className="text-green-600 font-bold">Entregado</span>
+                      ) : (
+                        <span className="text-orange-500 font-bold">Pendiente</span>
+                      )}
                     </td>
                     <td>
                       <button
                         onClick={() => handleAbrirModal(despacho)}
-                        className="py-1 bg-orange-200 px-8 rounded-xl shadow-md hover:bg-orange-300/70 transition-all duration-300 "
+                        className="py-1 bg-orange-200 px-4 rounded-xl shadow hover:bg-orange-300 transition-all"
                       >
-                        Cerrar despacho
+                        Cerrar
                       </button>
                     </td>
                   </tr>
@@ -90,18 +84,13 @@ export const TableDespachos = () => {
           </div>
         </div>
       </section>
-      <Modal
-        onClose={() => {
-          setOpenModal(false);
-        }}
-        open={openModal}
-      >
+      <Modal onClose={() => setOpenModal(false)} open={openModal}>
         {despachoSeleccionado && (
           <FormCierreDespacho
             despacho={despachoSeleccionado}
             onClose={() => {
-              //onclose es un prop que pasa funciones al modal con el form abierto, por ende al cerrarse, se ejecutan esas 2 funciones
-              setOpenModal(false), despacho();
+              setOpenModal(false);
+              cargarDespachos();
             }}
           />
         )}
