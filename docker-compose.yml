@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: innovatech_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  back-despachos:
+    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+    container_name: back-despachos
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_ENDPOINT=db
+      - DB_PORT=3306
+      - DB_NAME=innovatech_db
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+
+  back-ventas:
+    build: ./back-Ventas_SpringBoot/Springboot-API-REST
+    container_name: back-ventas
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_ENDPOINT=db
+      - DB_PORT=3306
+      - DB_NAME=innovatech_db
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+
+  frontend:
+    build: ./front_despacho
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - back-despachos
+      - back-ventas
+
+volumes:
+  mysql_data:
+    driver: local
