@@ -11,15 +11,15 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    # Cambiado a formato string para evitar errores de validación
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      test: mysqladmin ping -h localhost -u${MYSQL_USER} -p${MYSQL_PASSWORD}
       timeout: 5s
       retries: 10
       interval: 10s
     networks:
       - back-net
 
-  # Nuevo servicio para manejar Usuarios y Productos desde db.json
   mock-api:
     image: node:18-alpine
     container_name: mock-api
@@ -33,16 +33,49 @@ services:
       - front-net
 
   back-despachos:
-    # ... (resto de tu configuración actual)
+    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+    container_name: back-despachos
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_ENDPOINT=${DB_ENDPOINT}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy 
     networks:
       - back-net
       - front-net
-    # ...
+
+  back-ventas:
+    build: ./back-Ventas_SpringBoot/Springboot-API-REST
+    container_name: back-ventas
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_ENDPOINT=${DB_ENDPOINT}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - back-net
+      - front-net
 
   frontend:
-    # ... (resto de tu configuración actual)
+    build: ./front_despacho
+    container_name: frontend
+    ports:
+      - "80:80"
     depends_on:
       - back-despachos
+      - back-ventas
       - mock-api
     networks:
       - front-net
