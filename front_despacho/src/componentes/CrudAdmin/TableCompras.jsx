@@ -12,7 +12,7 @@ export const TableCompras = () => {
       const response = await axios.get(url);
       setVentas(response.data);
     } catch (error) {
-      console.error("Error al cargar ventas:", error);
+      console.error("Error al conectar con el servicio de ventas:", error);
     }
   };
 
@@ -22,42 +22,37 @@ export const TableCompras = () => {
   const [ventaSeleccionada, setVentaSeleccionada] = useState(null);
 
   return (
-    <>
-      <section className="grid text-center grid-cols-12 mb-8">
-        <div className="col-span-12 flex justify-center">
-          <div className="col-span-10 p-4 bg-white border border-gray-200 rounded-lg shadow h-full overflow-hidden">
-            <table className="table-fixed w-full">
-              <thead>
-                <tr className="border-b">
-                  <th>ID Orden</th>
-                  <th>Dirección</th>
-                  <th>Fecha</th>
-                  <th>Total</th>
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ventas.filter(v => !v.despachoGenerado).map((venta) => (
-                  <tr key={venta.idVenta} className="border-b">
-                    <td className="py-4">{venta.idVenta}</td>
-                    <td>{venta.direccionCompra}</td>
-                    <td>{venta.fechaCompra}</td>
-                    <td className="font-bold">${venta.valorCompra}</td>
-                    <td>
-                      <button onClick={() => {setVentaSeleccionada(venta); setOpenModal(true);}} className="bg-orange-200 px-4 py-1 rounded-xl">
-                        Generar Despacho
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+    <section className="p-4 bg-white rounded-lg shadow">
+      <h2 className="text-xl font-bold mb-4 text-teal-700">Órdenes de Compra</h2>
+      <table className="w-full text-center">
+        <thead>
+          <tr className="border-b">
+            <th>ID</th>
+            <th>Dirección</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ventas.filter(v => !v.despachoGenerado).map((venta) => (
+            <tr key={venta.idVenta} className="border-b hover:bg-gray-50">
+              <td className="py-3">{venta.idVenta}</td>
+              <td>{venta.direccionCompra}</td>
+              <td>{venta.fechaCompra}</td>
+              <td>${venta.valorCompra}</td>
+              <td>
+                <button onClick={() => {setVentaSeleccionada(venta); setOpenModal(true);}} className="bg-orange-200 px-4 py-1 rounded-lg">
+                  Despachar
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <Modal onClose={() => setOpenModal(false)} open={openModal}>
         {ventaSeleccionada && <FormDespacho venta={ventaSeleccionada} onClose={() => {setOpenModal(false); compras();}} />}
       </Modal>
-    </>
+    </section>
   );
 };
