@@ -1,0 +1,42 @@
+name: CI/CD Deploy
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build y Push imágenes
+        run: |
+          docker compose build
+          docker tag proyectoev2-frontend asuservicio/frontend:latest
+          docker tag proyectoev2-back-ventas asuservicio/back-ventas:latest
+          docker tag proyectoev2-back-despachos asuservicio/back-despachos:latest
+          docker push asuservicio/frontend:latest
+          docker push asuservicio/back-ventas:latest
+          docker push asuservicio/back-despachos:latest
+
+      - name: Deploy en EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/proyectoEV2
+            git pull origin deploy
+            docker compose pull
+            docker compose up -d --build
